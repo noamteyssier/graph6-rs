@@ -1,16 +1,32 @@
-use super::Graph6Error;
+use super::IOError;
 
-pub struct DiGraph6 {
+/// Creates a directed graph from a graph6 representation
+pub struct DiGraph {
     bit_vec: Vec<usize>,
     n: usize,
 }
-impl DiGraph6 {
+impl DiGraph {
 
-    pub fn from_d6(repr: &str) -> Result<Self, Graph6Error> {
+    /// Creates a new DiGraph from a graph6 representation string
+    ///
+    /// # Arguments
+    /// * `repr` - A graph6 representation string
+    ///
+    /// # Errors
+    /// Returns an error if the graph6 representation is invalid (i.e. missing digraph header '&')
+    ///
+    /// # Examples
+    /// ```
+    /// use graph6_rs::DiGraph;
+    /// let graph = DiGraph::from_d6("&AG").unwrap();
+    /// assert_eq!(graph.size(), 2);
+    /// assert_eq!(graph.bit_vec(), &[0, 0, 1, 0]);
+    /// ```
+    pub fn from_d6(repr: &str) -> Result<Self, IOError> {
         let bytes = repr.as_bytes();
 
         if !Self::valid_digraph(bytes) {
-            return Err(Graph6Error::InvalidDigraphHeader)
+            return Err(IOError::InvalidDigraphHeader)
         }
         let n = Self::get_size(bytes);
         let bit_vec = Self::build_bitvector(bytes, n);
@@ -120,21 +136,21 @@ mod testing {
     #[test]
     fn test_header() {
         let repr = b"&AG";
-        assert!(super::DiGraph6::valid_digraph(repr));
+        assert!(super::DiGraph::valid_digraph(repr));
     }
 
     #[test]
     fn test_invalid_header() {
         let repr = b"AG";
-        assert!(!super::DiGraph6::valid_digraph(repr));
+        assert!(!super::DiGraph::valid_digraph(repr));
     }
 
     #[test]
     fn test_size() {
-        assert_eq!(super::DiGraph6::get_size(b"&AG"), 2);
-        assert_eq!(super::DiGraph6::get_size(b"&BG"), 3);
-        assert_eq!(super::DiGraph6::get_size(b"&CG"), 4);
-        assert_eq!(super::DiGraph6::get_size(b"&DG"), 5);
+        assert_eq!(super::DiGraph::get_size(b"&AG"), 2);
+        assert_eq!(super::DiGraph::get_size(b"&BG"), 3);
+        assert_eq!(super::DiGraph::get_size(b"&CG"), 4);
+        assert_eq!(super::DiGraph::get_size(b"&DG"), 5);
     }
 
     #[test]
@@ -143,8 +159,8 @@ mod testing {
     /// 1 0
     fn test_bitvector_n2() {
         let repr = b"&AG";
-        let n = super::DiGraph6::get_size(repr);
-        let bit_vec = super::DiGraph6::build_bitvector(repr, n);
+        let n = super::DiGraph::get_size(repr);
+        let bit_vec = super::DiGraph::build_bitvector(repr, n);
         assert_eq!(bit_vec, vec![0, 0, 1, 0]);
     }
 
@@ -155,8 +171,8 @@ mod testing {
     /// 1 1 0
     fn test_bitvector_n3() {
         let repr = br"&B\o";
-        let n = super::DiGraph6::get_size(repr);
-        let bit_vec = super::DiGraph6::build_bitvector(repr, n);
+        let n = super::DiGraph::get_size(repr);
+        let bit_vec = super::DiGraph::build_bitvector(repr, n);
         assert_eq!(bit_vec, vec![0, 1, 1, 1, 0, 1, 1, 1, 0]);
     }
 
@@ -168,15 +184,15 @@ mod testing {
     /// 1 1 1 0
     fn test_bitvector_n4() {
         let repr = br"&C]|w";
-        let n = super::DiGraph6::get_size(repr);
-        let bit_vec = super::DiGraph6::build_bitvector(repr, n);
+        let n = super::DiGraph::get_size(repr);
+        let bit_vec = super::DiGraph::build_bitvector(repr, n);
         assert_eq!(bit_vec, vec![0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]);
     }
 
     #[test]
     fn test_init_n2() {
         let repr = "&AG";
-        let graph = super::DiGraph6::from_d6(repr).unwrap();
+        let graph = super::DiGraph::from_d6(repr).unwrap();
         assert_eq!(graph.size(), 2);
         assert_eq!(graph.bit_vec(), vec![0, 0, 1, 0]);
     }
@@ -184,14 +200,14 @@ mod testing {
     #[test]
     fn test_init_invalid_n2() {
         let repr = "AG";
-        let graph = super::DiGraph6::from_d6(repr);
+        let graph = super::DiGraph::from_d6(repr);
         assert!(graph.is_err());
     }
 
     #[test]
     fn test_to_adjacency() {
         let repr = r"&C]|w";
-        let graph = super::DiGraph6::from_d6(repr).unwrap();
+        let graph = super::DiGraph::from_d6(repr).unwrap();
         let adj = graph.to_adjacency();
         assert_eq!(adj, "0 1 1 1 \n1 0 1 1 \n1 1 0 1 \n1 1 1 0 \n");
     }
@@ -199,7 +215,7 @@ mod testing {
     #[test]
     fn test_to_dot() {
         let repr = r"&AG";
-        let graph = super::DiGraph6::from_d6(repr).unwrap();
+        let graph = super::DiGraph::from_d6(repr).unwrap();
         let dot = graph.to_dot(None);
         assert_eq!(dot, "digraph {\n1 -> 0;\n}");
     }
@@ -207,7 +223,7 @@ mod testing {
     #[test]
     fn test_to_dot_with_id() {
         let repr = r"&AG";
-        let graph = super::DiGraph6::from_d6(repr).unwrap();
+        let graph = super::DiGraph::from_d6(repr).unwrap();
         let dot = graph.to_dot(Some(1));
         assert_eq!(dot, "digraph graph_1 {\n1 -> 0;\n}");
     }
@@ -215,7 +231,7 @@ mod testing {
     #[test]
     fn test_to_net() {
         let repr = r"&AG";
-        let graph = super::DiGraph6::from_d6(repr).unwrap();
+        let graph = super::DiGraph::from_d6(repr).unwrap();
         let net = graph.to_net();
         assert_eq!(net, "*Vertices 2\n1 \"0\"\n2 \"1\"\n*Arcs\n2 1\n");
     }
