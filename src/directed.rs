@@ -1,5 +1,5 @@
-use crate::utils::{get_size, fill_bitvector};
-use super::{IOError, GraphConversion};
+use super::{GraphConversion, IOError};
+use crate::utils::{fill_bitvector, get_size};
 
 /// Creates a directed graph from a graph6 representation
 pub struct DiGraph {
@@ -7,7 +7,6 @@ pub struct DiGraph {
     pub n: usize,
 }
 impl DiGraph {
-
     /// Creates a new DiGraph from a graph6 representation string
     ///
     /// # Arguments
@@ -28,7 +27,7 @@ impl DiGraph {
         Self::valid_digraph(bytes)?;
         let n = get_size(bytes, 1)?;
         let bit_vec = Self::build_bitvector(bytes, n);
-        Ok(Self{ bit_vec, n })
+        Ok(Self { bit_vec, n })
     }
 
     /// Validates graph6 directed representation
@@ -54,11 +53,9 @@ impl DiGraph {
         let adj_bv_len = bit_vec.len() - (bit_vec.len() - (bv_len));
         bit_vec.truncate(adj_bv_len);
     }
-
 }
 
 impl GraphConversion for DiGraph {
-
     fn bit_vec(&self) -> &[usize] {
         &self.bit_vec
     }
@@ -121,7 +118,10 @@ mod testing {
         let repr = r"&C]|w";
         let graph = super::DiGraph::from_d6(repr).unwrap();
         assert_eq!(graph.size(), 4);
-        assert_eq!(graph.bit_vec(), vec![0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]);
+        assert_eq!(
+            graph.bit_vec(),
+            vec![0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]
+        );
     }
 
     #[test]

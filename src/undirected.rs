@@ -1,5 +1,5 @@
-use crate::utils::{get_size, fill_bitvector};
-use super::{IOError, GraphConversion};
+use super::{GraphConversion, IOError};
+use crate::utils::{fill_bitvector, get_size};
 
 /// Creates an undirected graph from a graph6 representation
 pub struct Graph {
@@ -7,7 +7,6 @@ pub struct Graph {
     pub n: usize,
 }
 impl Graph {
-
     /// Creates a new undirected graph from a graph6 representation
     ///
     /// # Arguments
@@ -24,12 +23,12 @@ impl Graph {
         let bytes = repr.as_bytes();
         let n = get_size(bytes, 0)?;
         let bit_vec = Self::build_bitvector(bytes, n);
-        Ok(Self {bit_vec, n })
+        Ok(Self { bit_vec, n })
     }
 
     /// Builds the bitvector from the graph6 representation
     fn build_bitvector(bytes: &[u8], n: usize) -> Vec<usize> {
-        let bv_len = n * (n-1) / 2;
+        let bv_len = n * (n - 1) / 2;
         let mut bit_vec = fill_bitvector(bytes, n, 1);
         Self::adjust_bitvector_len(&mut bit_vec, bv_len);
         Self::fill_from_triangle(&bit_vec, n)
@@ -58,7 +57,6 @@ impl Graph {
     }
 }
 impl GraphConversion for Graph {
-
     /// Returns the bitvector representation of the graph
     fn bit_vec(&self) -> &[usize] {
         &self.bit_vec
@@ -104,7 +102,10 @@ mod testing {
     fn test_graph_n4() {
         let graph = Graph::from_g6("C~").unwrap();
         assert_eq!(graph.size(), 4);
-        assert_eq!(graph.bit_vec(), &[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]);
+        assert_eq!(
+            graph.bit_vec(),
+            &[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]
+        );
     }
 
     #[test]

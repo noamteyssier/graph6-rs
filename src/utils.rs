@@ -3,7 +3,7 @@ use super::IOError;
 /// Iterates through the bytes of a graph and fills a bitvector representing
 /// the adjacency matrix of the graph
 pub fn fill_bitvector(bytes: &[u8], n: usize, offset: usize) -> Vec<usize> {
-    let mut bit_vec = Vec::with_capacity(n*n);
+    let mut bit_vec = Vec::with_capacity(n * n);
     for byte in bytes.iter().skip(offset).take(n) {
         let byte = byte - 63;
         for shift in (0..6).rev() {
@@ -60,14 +60,14 @@ mod testing {
         let size = get_size(bytes, 0).unwrap_err();
         assert_eq!(size, super::IOError::InvalidSizeChar);
     }
-    
+
     #[test]
     fn test_bitvector() {
         let bytes = b"GG";
         let bit_vec = super::fill_bitvector(bytes, 2, 0);
         assert_eq!(bit_vec, vec![0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0]);
     }
-    
+
     #[test]
     fn test_bitvector_offset() {
         let bytes = b"AG";

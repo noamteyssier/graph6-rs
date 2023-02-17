@@ -1,7 +1,5 @@
-
 /// Conversion trait for graphs into various text graph formats
 pub trait GraphConversion {
-
     /// Returns the bitvector representation of the graph
     fn bit_vec(&self) -> &[usize];
 
