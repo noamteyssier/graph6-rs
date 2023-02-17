@@ -1,6 +1,6 @@
 [package]
 name = "graph6-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 keywords = [ "parser", "graphs", "graph6", "nauty" ]
 license = "MIT"
