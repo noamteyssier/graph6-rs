@@ -1,6 +1,8 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum IOError {
     InvalidDigraphHeader,
+    InvalidSizeChar,
+    GraphTooLarge,
 }
 
 #[cfg(test)]
