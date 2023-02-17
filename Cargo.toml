@@ -3,6 +3,8 @@ name = "graph6-rs"
 version = "0.1.0"
 edition = "2021"
 keywords = [ "parser", "graphs", "graph6", "nauty" ]
+license = "MIT"
+description = "A library for parsing graph6/digraph6 strings and converting them into other text based formats"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
