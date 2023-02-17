@@ -1,4 +1,4 @@
-use crate::utils::get_size;
+use crate::utils::{get_size, fill_bitvector};
 use super::{IOError, GraphConversion};
 
 /// Creates an undirected graph from a graph6 representation
@@ -30,18 +30,7 @@ impl Graph {
     /// Builds the bitvector from the graph6 representation
     fn build_bitvector(bytes: &[u8], n: usize) -> Vec<usize> {
         let bv_len = n * (n-1) / 2;
-
-        let mut bit_vec = Vec::with_capacity(bv_len);
-        for byte in bytes.iter().skip(1).take(n) {
-            let byte = byte - 63;
-            for shift in (0..6).rev() {
-                if (byte & 1 << shift) > 0 {
-                    bit_vec.push(1);
-                } else {
-                    bit_vec.push(0);
-                }
-            }
-        }
+        let mut bit_vec = fill_bitvector(bytes, n, 1);
         Self::adjust_bitvector_len(&mut bit_vec, bv_len);
         Self::fill_from_triangle(&bit_vec, n)
     }
