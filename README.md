@@ -4,7 +4,9 @@ a rust library for graph6 formatted files from NAUTY
 
 ## File Format Description
 
-The graph6 format for undirected, sparse, and directed graphs can be found [here](https://users.cecs.anu.edu.au/~bdm/data/formats.txt).
+The graph6 format for undirected, sparse, and directed graphs can be found
+[here](https://users.cecs.anu.edu.au/~bdm/data/formats.txt) and is mirrored
+in this repo at `resources/formats.txt`.
 
 ## Related Crates
 
