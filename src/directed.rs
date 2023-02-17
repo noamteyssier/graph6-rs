@@ -1,11 +1,10 @@
 use crate::utils::get_size;
-
-use super::IOError;
+use super::{IOError, GraphConversion};
 
 /// Creates a directed graph from a graph6 representation
 pub struct DiGraph {
-    bit_vec: Vec<usize>,
-    n: usize,
+    pub bit_vec: Vec<usize>,
+    pub n: usize,
 }
 impl DiGraph {
 
@@ -21,8 +20,8 @@ impl DiGraph {
     /// ```
     /// use graph6_rs::DiGraph;
     /// let graph = DiGraph::from_d6("&AG").unwrap();
-    /// assert_eq!(graph.size(), 2);
-    /// assert_eq!(graph.bit_vec(), &[0, 0, 1, 0]);
+    /// assert_eq!(graph.n, 2);
+    /// assert_eq!(graph.bit_vec, &[0, 0, 1, 0]);
     /// ```
     pub fn from_d6(repr: &str) -> Result<Self, IOError> {
         let bytes = repr.as_bytes();
@@ -67,69 +66,26 @@ impl DiGraph {
         bit_vec.truncate(adj_bv_len);
     }
 
-    /// Writes graph as adjacency matrix
-    pub fn to_adjacency(&self) -> String {
-        let mut adj = String::new();
-        for i in 0..self.n {
-            for j in 0..self.n {
-                adj.push_str(&format!("{} ", self.bit_vec[i * self.n + j]));
-            }
-            adj.push_str("\n");
-        }
-        adj
-    }
+}
 
-    /// Writes graph as a DOT file
-    pub fn to_dot(&self, id: Option<usize>) -> String {
-        let mut dot = String::new();
-        if let Some(id) = id {
-            dot.push_str(&format!(r"digraph graph_{} {{", id));
-        } else {
-            dot.push_str("digraph {");
-        }
-        for i in 0..self.n {
-            for j in 0..self.n {
-                if self.bit_vec[i * self.n + j] == 1 {
-                    dot.push_str(&format!("\n{} -> {};", i, j));
-                }
-            }
-        }
-        dot.push_str("\n}");
-        dot
-    }
+impl GraphConversion for DiGraph {
 
-    /// Writes graph as Pajeck .NET file
-    pub fn to_net(&self) -> String {
-        let mut net = String::new();
-        net.push_str(&format!("*Vertices {}\n", self.n));
-        for i in 0..self.n {
-            net.push_str(&format!("{} \"{}\"\n", i + 1, i));
-        }
-        net.push_str("*Arcs\n");
-        for i in 0..self.n {
-            for j in 0..self.n {
-                if self.bit_vec[i * self.n + j] == 1 {
-                    net.push_str(&format!("{} {}\n", i + 1, j + 1));
-                }
-            }
-        }
-        net
-
-    }
-
-    /// Returns the bitvector representing the flattened adjacency matrix of the graph
-    pub fn bit_vec(&self) -> &[usize] {
+    fn bit_vec(&self) -> &[usize] {
         &self.bit_vec
     }
 
-    /// Returns the size of the graph (number of vertices)
-    pub fn size(&self) -> usize {
+    fn size(&self) -> usize {
         self.n
+    }
+
+    fn is_directed(&self) -> bool {
+        true
     }
 }
 
 #[cfg(test)]
 mod testing {
+    use super::GraphConversion;
 
     #[test]
     fn test_header() {
@@ -190,8 +146,8 @@ mod testing {
     fn test_to_adjacency() {
         let repr = r"&C]|w";
         let graph = super::DiGraph::from_d6(repr).unwrap();
-        let adj = graph.to_adjacency();
-        assert_eq!(adj, "0 1 1 1 \n1 0 1 1 \n1 1 0 1 \n1 1 1 0 \n");
+        let adj = graph.to_adjmat();
+        assert_eq!(adj, "0 1 1 1\n1 0 1 1\n1 1 0 1\n1 1 1 0\n");
     }
 
     #[test]
