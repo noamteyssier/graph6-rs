@@ -1,3 +1,5 @@
+use crate::utils::get_size;
+
 use super::IOError;
 
 /// Creates a directed graph from a graph6 representation
@@ -24,23 +26,19 @@ impl DiGraph {
     /// ```
     pub fn from_d6(repr: &str) -> Result<Self, IOError> {
         let bytes = repr.as_bytes();
-
-        if !Self::valid_digraph(bytes) {
-            return Err(IOError::InvalidDigraphHeader)
-        }
-        let n = Self::get_size(bytes);
+        Self::valid_digraph(bytes)?;
+        let n = get_size(bytes, 1)?;
         let bit_vec = Self::build_bitvector(bytes, n);
         Ok(Self{ bit_vec, n })
     }
 
     /// Validates graph6 directed representation
-    fn valid_digraph(repr: &[u8]) -> bool {
-        repr[0] == b'&'
-    }
-
-    /// Returns the size of the graph
-    fn get_size(repr: &[u8]) -> usize {
-        (repr[1] - 63) as usize
+    fn valid_digraph(repr: &[u8]) -> Result<bool, IOError> {
+        if repr[0] == b'&' {
+            Ok(true)
+        } else {
+            Err(IOError::InvalidDigraphHeader)
+        }
     }
 
     /// Iteratores through the bytes and builds a bitvector
@@ -66,7 +64,7 @@ impl DiGraph {
     /// Adjusts the bitvector length to the expected size of the digraph (n*n)
     fn adjust_bitvector_len(bit_vec: &mut Vec<usize>, bv_len: usize) {
         let adj_bv_len = bit_vec.len() - (bit_vec.len() - (bv_len));
-        bit_vec.resize(adj_bv_len, 0);
+        bit_vec.truncate(adj_bv_len);
     }
 
     /// Writes graph as adjacency matrix
@@ -136,21 +134,13 @@ mod testing {
     #[test]
     fn test_header() {
         let repr = b"&AG";
-        assert!(super::DiGraph::valid_digraph(repr));
+        assert!(super::DiGraph::valid_digraph(repr).is_ok());
     }
 
     #[test]
     fn test_invalid_header() {
         let repr = b"AG";
-        assert!(!super::DiGraph::valid_digraph(repr));
-    }
-
-    #[test]
-    fn test_size() {
-        assert_eq!(super::DiGraph::get_size(b"&AG"), 2);
-        assert_eq!(super::DiGraph::get_size(b"&BG"), 3);
-        assert_eq!(super::DiGraph::get_size(b"&CG"), 4);
-        assert_eq!(super::DiGraph::get_size(b"&DG"), 5);
+        assert!(super::DiGraph::valid_digraph(repr).is_err());
     }
 
     #[test]
@@ -158,10 +148,10 @@ mod testing {
     /// 0 1
     /// 1 0
     fn test_bitvector_n2() {
-        let repr = b"&AG";
-        let n = super::DiGraph::get_size(repr);
-        let bit_vec = super::DiGraph::build_bitvector(repr, n);
-        assert_eq!(bit_vec, vec![0, 0, 1, 0]);
+        let repr = "&AG";
+        let graph = super::DiGraph::from_d6(repr).unwrap();
+        assert_eq!(graph.size(), 2);
+        assert_eq!(graph.bit_vec(), vec![0, 0, 1, 0]);
     }
 
     #[test]
@@ -170,10 +160,10 @@ mod testing {
     /// 1 0 1
     /// 1 1 0
     fn test_bitvector_n3() {
-        let repr = br"&B\o";
-        let n = super::DiGraph::get_size(repr);
-        let bit_vec = super::DiGraph::build_bitvector(repr, n);
-        assert_eq!(bit_vec, vec![0, 1, 1, 1, 0, 1, 1, 1, 0]);
+        let repr = r"&B\o";
+        let graph = super::DiGraph::from_d6(repr).unwrap();
+        assert_eq!(graph.size(), 3);
+        assert_eq!(graph.bit_vec(), vec![0, 1, 1, 1, 0, 1, 1, 1, 0]);
     }
 
     #[test]
@@ -183,18 +173,10 @@ mod testing {
     /// 1 1 0 1
     /// 1 1 1 0
     fn test_bitvector_n4() {
-        let repr = br"&C]|w";
-        let n = super::DiGraph::get_size(repr);
-        let bit_vec = super::DiGraph::build_bitvector(repr, n);
-        assert_eq!(bit_vec, vec![0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]);
-    }
-
-    #[test]
-    fn test_init_n2() {
-        let repr = "&AG";
+        let repr = r"&C]|w";
         let graph = super::DiGraph::from_d6(repr).unwrap();
-        assert_eq!(graph.size(), 2);
-        assert_eq!(graph.bit_vec(), vec![0, 0, 1, 0]);
+        assert_eq!(graph.size(), 4);
+        assert_eq!(graph.bit_vec(), vec![0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]);
     }
 
     #[test]
