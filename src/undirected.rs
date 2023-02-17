@@ -1,10 +1,10 @@
 use crate::utils::get_size;
-use super::IOError;
+use super::{IOError, GraphConversion};
 
 /// Creates an undirected graph from a graph6 representation
 pub struct Graph {
-    bit_vec: Vec<usize>,
-    n: usize,
+    pub bit_vec: Vec<usize>,
+    pub n: usize,
 }
 impl Graph {
 
@@ -17,8 +17,8 @@ impl Graph {
     /// ```
     /// use graph6_rs::Graph;
     /// let graph = Graph::from_g6("A_").unwrap();
-    /// assert_eq!(graph.size(), 2);
-    /// assert_eq!(graph.bit_vec(), &[0, 1, 1, 0]);
+    /// assert_eq!(graph.n, 2);
+    /// assert_eq!(graph.bit_vec, &[0, 1, 1, 0]);
     /// ```
     pub fn from_g6(repr: &str) -> Result<Self, IOError> {
         let bytes = repr.as_bytes();
@@ -67,22 +67,28 @@ impl Graph {
         }
         bit_vec
     }
+}
+impl GraphConversion for Graph {
 
-    /// Returns the bitvector representing the flattened adjacency matrix of the graph
-    pub fn bit_vec(&self) -> &[usize] {
+    /// Returns the bitvector representation of the graph
+    fn bit_vec(&self) -> &[usize] {
         &self.bit_vec
     }
 
-    /// Returns the size of the graph (number of vertices)
-    pub fn size(&self) -> usize {
+    /// Returns the number of vertices in the graph
+    fn size(&self) -> usize {
         self.n
     }
 
+    /// Returns true if the graph is directed
+    fn is_directed(&self) -> bool {
+        false
+    }
 }
 
 #[cfg(test)]
 mod testing {
-    use super::Graph;
+    use super::{Graph, GraphConversion};
 
     #[test]
     fn test_graph_n2() {
@@ -110,5 +116,34 @@ mod testing {
         let graph = Graph::from_g6("C~").unwrap();
         assert_eq!(graph.size(), 4);
         assert_eq!(graph.bit_vec(), &[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]);
+    }
+
+    #[test]
+    fn test_to_adjacency() {
+        let graph = Graph::from_g6("A_").unwrap();
+        let adj = graph.to_adjmat();
+        assert_eq!(adj, "0 1\n1 0\n");
+    }
+
+    #[test]
+    fn test_to_dot() {
+        let graph = Graph::from_g6("A_").unwrap();
+        let dot = graph.to_dot(None);
+        assert_eq!(dot, "graph {\n0 -- 1;\n}");
+    }
+
+    #[test]
+    fn test_to_dot_with_label() {
+        let graph = Graph::from_g6("A_").unwrap();
+        let dot = graph.to_dot(Some(1));
+        assert_eq!(dot, "graph graph_1 {\n0 -- 1;\n}");
+    }
+
+    #[test]
+    fn test_to_net() {
+        let repr = r"A_";
+        let graph = Graph::from_g6(repr).unwrap();
+        let net = graph.to_net();
+        assert_eq!(net, "*Vertices 2\n1 \"0\"\n2 \"1\"\n*Arcs\n1 2\n2 1\n");
     }
 }
