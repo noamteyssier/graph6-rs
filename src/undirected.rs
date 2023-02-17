@@ -8,6 +8,18 @@ pub struct Graph {
 }
 impl Graph {
 
+    /// Creates a new undirected graph from a graph6 representation
+    ///
+    /// # Arguments
+    /// * `repr` - A graph6 representation of the graph
+    ///
+    /// # Example
+    /// ```
+    /// use graph6_rs::Graph;
+    /// let graph = Graph::from_g6("A_").unwrap();
+    /// assert_eq!(graph.size(), 2);
+    /// assert_eq!(graph.bit_vec(), &[0, 1, 1, 0]);
+    /// ```
     pub fn from_g6(repr: &str) -> Result<Self, IOError> {
         let bytes = repr.as_bytes();
         let n = get_size(bytes, 0)?;
@@ -15,6 +27,7 @@ impl Graph {
         Ok(Self {bit_vec, n })
     }
 
+    /// Builds the bitvector from the graph6 representation
     fn build_bitvector(bytes: &[u8], n: usize) -> Vec<usize> {
         let bv_len = n * (n-1) / 2;
 
@@ -33,11 +46,13 @@ impl Graph {
         Self::fill_from_triangle(&bit_vec, n)
     }
 
+    /// Adjusts the length of the bitvector to the correct length
     fn adjust_bitvector_len(bit_vec: &mut Vec<usize>, bv_len: usize) {
         let adj_bv_len = bit_vec.len() - (bit_vec.len() - bv_len);
         bit_vec.truncate(adj_bv_len);
     }
 
+    /// Fills the adjacency bitvector from an upper triangle
     fn fill_from_triangle(tri: &[usize], n: usize) -> Vec<usize> {
         let mut bit_vec = vec![0; n * n];
         let mut tri_iter = tri.iter();
