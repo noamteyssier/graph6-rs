@@ -5,7 +5,7 @@ env:
 jobs:
 
   ci:
-    needs: [build, test, docs, coverage, pytest]
+    needs: [build, test, docs, coverage]
     name: CI
     runs-on: 'ubuntu-latest'
     steps:
