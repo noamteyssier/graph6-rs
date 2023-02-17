@@ -1,15 +1,15 @@
 #[derive(Debug)]
-pub enum Graph6Error {
+pub enum IOError {
     InvalidDigraphHeader,
 }
 
 #[cfg(test)]
 mod testing {
-    use super::*;
+    use super::IOError;
 
     #[test]
     fn test_error() {
-        let err = Graph6Error::InvalidDigraphHeader;
+        let err = IOError::InvalidDigraphHeader;
         println!("{:?}", err);
     }
 }
