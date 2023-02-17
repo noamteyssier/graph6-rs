@@ -27,7 +27,7 @@ pub trait GraphConversion {
         if let Some(id) = id {
             dot.push_str(&format!("graph_{} {{", id));
         } else {
-            dot.push_str("{");
+            dot.push('{');
         }
 
         // include edges
@@ -73,10 +73,10 @@ pub trait GraphConversion {
             for j in 0..n {
                 adj.push_str(&format!("{}", bit_vec[i * n + j]));
                 if j < n - 1 {
-                    adj.push_str(" ");
+                    adj.push(' ');
                 }
             }
-            adj.push_str("\n");
+            adj.push('\n');
         }
         adj
     }
