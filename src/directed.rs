@@ -1,7 +1,8 @@
 use super::{GraphConversion, IOError};
-use crate::utils::{fill_bitvector, get_size};
+use crate::{utils::{fill_bitvector, get_size}, WriteGraph};
 
 /// Creates a directed graph from a graph6 representation
+#[derive(Debug)]
 pub struct DiGraph {
     pub bit_vec: Vec<usize>,
     pub n: usize,
@@ -53,6 +54,7 @@ impl DiGraph {
         let adj_bv_len = bit_vec.len() - (bit_vec.len() - (bv_len));
         bit_vec.truncate(adj_bv_len);
     }
+
 }
 
 impl GraphConversion for DiGraph {
@@ -69,8 +71,33 @@ impl GraphConversion for DiGraph {
     }
 }
 
+impl WriteGraph for DiGraph {
+    fn write_graph(&self) -> String {
+        let mut repr = String::new();
+        let size_char = char::from_u32(self.n as u32+ 63).unwrap();
+        let mut bv = self.bit_vec.to_vec();
+        if bv.len() % 6 != 0 {
+            (0..6-(bv.len() % 6)).for_each(|_| bv.push(0));
+        }
+
+        repr.push('&');
+        repr.push(size_char);
+        for chunk in bv.chunks(6) {
+            let mut sum = 0;
+            for (i, bit) in chunk.iter().rev().enumerate() {
+                sum += bit * 2usize.pow(i as u32);
+            }
+            let char = char::from_u32(sum as u32 + 63).unwrap();
+            repr.push(char);
+        }
+        repr
+    }
+}
+
 #[cfg(test)]
 mod testing {
+    use crate::WriteGraph;
+
     use super::GraphConversion;
 
     #[test]
@@ -161,5 +188,29 @@ mod testing {
         let graph = super::DiGraph::from_d6(repr).unwrap();
         let net = graph.to_net();
         assert_eq!(net, "*Vertices 2\n1 \"0\"\n2 \"1\"\n*Arcs\n2 1\n");
+    }
+
+    #[test]
+    fn test_write_n2() {
+        let repr = r"&AG";
+        let graph = super::DiGraph::from_d6(repr).unwrap();
+        let graph6 = graph.write_graph();
+        assert_eq!(graph6, repr);
+    }
+
+    #[test]
+    fn test_write_n3() {
+        let repr = r"&B\o";
+        let graph = super::DiGraph::from_d6(repr).unwrap();
+        let graph6 = graph.write_graph();
+        assert_eq!(graph6, repr);
+    }
+
+    #[test]
+    fn test_write_n4() {
+        let repr = r"&C]|w";
+        let graph = super::DiGraph::from_d6(repr).unwrap();
+        let graph6 = graph.write_graph();
+        assert_eq!(graph6, repr);
     }
 }

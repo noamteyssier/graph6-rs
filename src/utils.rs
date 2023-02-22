@@ -29,6 +29,18 @@ pub fn get_size(bytes: &[u8], pos: usize) -> Result<usize, IOError> {
     }
 }
 
+/// Returns the upper triangle of a bitvector
+pub fn upper_triangle(bit_vec: &[usize], n: usize) -> Vec<usize> {
+    let mut tri = Vec::with_capacity(n * (n - 1) / 2);
+    for i in 1..n {
+        for j in 0..i {
+            let idx = i * n + j;
+            tri.push(bit_vec[idx])
+        }
+    }
+    tri
+}
+
 #[cfg(test)]
 mod testing {
     use super::get_size;
@@ -73,5 +85,19 @@ mod testing {
         let bytes = b"AG";
         let bit_vec = super::fill_bitvector(bytes, 2, 1);
         assert_eq!(bit_vec, vec![0, 0, 1, 0, 0, 0]);
+    }
+
+    #[test]
+    fn test_upper_triangle_n2() {
+        let bit_vec = vec![0, 1, 1, 0];
+        let tri = super::upper_triangle(&bit_vec, 2);
+        assert_eq!(tri, vec![1]);
+    }
+
+    #[test]
+    fn test_upper_triangle_n3() {
+        let bit_vec = vec![0, 1, 1, 1, 0, 0, 1, 0, 0];
+        let tri = super::upper_triangle(&bit_vec, 3);
+        assert_eq!(tri, vec![1, 1, 0]);
     }
 }

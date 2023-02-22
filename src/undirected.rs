@@ -1,7 +1,8 @@
 use super::{GraphConversion, IOError};
-use crate::utils::{fill_bitvector, get_size};
+use crate::{utils::{fill_bitvector, get_size, upper_triangle}, WriteGraph};
 
 /// Creates an undirected graph from a graph6 representation
+#[derive(Debug)]
 pub struct Graph {
     pub bit_vec: Vec<usize>,
     pub n: usize,
@@ -55,6 +56,11 @@ impl Graph {
         }
         bit_vec
     }
+
+    /// Returns the upper triangle of the adjacency matrix
+    fn upper_triangle(&self) -> Vec<usize> {
+        upper_triangle(&self.bit_vec, self.n)
+    }
 }
 impl GraphConversion for Graph {
     /// Returns the bitvector representation of the graph
@@ -72,10 +78,32 @@ impl GraphConversion for Graph {
         false
     }
 }
+impl WriteGraph for Graph {
+    fn write_graph(&self) -> String {
+        let mut repr = String::new();
+        let size_char = char::from_u32(self.n as u32 + 63).unwrap();
+
+        let mut bv = self.upper_triangle();
+        if bv.len() % 6 != 0 {
+            (0..6-(bv.len() % 6)).for_each(|_| bv.push(0));
+        }
+
+        repr.push(size_char);
+        for chunk in bv.chunks(6) {
+            let mut sum = 0;
+            for (i, bit) in chunk.iter().rev().enumerate() {
+                sum += bit * 2usize.pow(i as u32);
+            }
+            let char = char::from_u32(sum as u32 + 63).unwrap();
+            repr.push(char);
+        }
+        repr
+    }
+}
 
 #[cfg(test)]
 mod testing {
-    use super::{Graph, GraphConversion};
+    use super::{Graph, GraphConversion, WriteGraph};
 
     #[test]
     fn test_graph_n2() {
@@ -136,4 +164,29 @@ mod testing {
         let net = graph.to_net();
         assert_eq!(net, "*Vertices 2\n1 \"0\"\n2 \"1\"\n*Arcs\n1 2\n2 1\n");
     }
+
+    #[test]
+    fn test_write_n2() {
+        let repr = r"A_";
+        let graph = Graph::from_g6(repr).unwrap();
+        let g6 = graph.write_graph();
+        assert_eq!(g6, repr);
+    }
+
+    #[test]
+    fn test_write_n3() {
+        let repr = r"Bw";
+        let graph = Graph::from_g6(repr).unwrap();
+        let g6 = graph.write_graph();
+        assert_eq!(g6, repr);
+    }
+
+    #[test]
+    fn test_write_n4() {
+        let repr = r"C~";
+        let graph = Graph::from_g6(repr).unwrap();
+        let g6 = graph.write_graph();
+        assert_eq!(g6, repr);
+    }
+
 }
