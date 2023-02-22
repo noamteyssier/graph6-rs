@@ -74,25 +74,8 @@ impl GraphConversion for DiGraph {
 }
 
 impl WriteGraph for DiGraph {
-    fn write_graph(&self) -> String {
-        let mut repr = String::new();
-        let size_char = char::from_u32(self.n as u32 + 63).unwrap();
-        let mut bv = self.bit_vec.to_vec();
-        if bv.len() % 6 != 0 {
-            (0..6 - (bv.len() % 6)).for_each(|_| bv.push(0));
-        }
-
-        repr.push('&');
-        repr.push(size_char);
-        for chunk in bv.chunks(6) {
-            let mut sum = 0;
-            for (i, bit) in chunk.iter().rev().enumerate() {
-                sum += bit * 2usize.pow(i as u32);
-            }
-            let char = char::from_u32(sum as u32 + 63).unwrap();
-            repr.push(char);
-        }
-        repr
+    fn owned_bit_vec(&self) -> Vec<usize> {
+        self.bit_vec.clone()
     }
 }
 
