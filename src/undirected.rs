@@ -1,5 +1,8 @@
 use super::{GraphConversion, IOError};
-use crate::{utils::{fill_bitvector, get_size, upper_triangle}, WriteGraph};
+use crate::{
+    utils::{fill_bitvector, get_size, upper_triangle},
+    WriteGraph,
+};
 
 /// Creates an undirected graph from a graph6 representation
 #[derive(Debug)]
@@ -85,7 +88,7 @@ impl WriteGraph for Graph {
 
         let mut bv = self.upper_triangle();
         if bv.len() % 6 != 0 {
-            (0..6-(bv.len() % 6)).for_each(|_| bv.push(0));
+            (0..6 - (bv.len() % 6)).for_each(|_| bv.push(0));
         }
 
         repr.push(size_char);
@@ -188,5 +191,4 @@ mod testing {
         let g6 = graph.write_graph();
         assert_eq!(g6, repr);
     }
-
 }

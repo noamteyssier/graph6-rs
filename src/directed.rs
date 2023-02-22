@@ -1,5 +1,8 @@
 use super::{GraphConversion, IOError};
-use crate::{utils::{fill_bitvector, get_size}, WriteGraph};
+use crate::{
+    utils::{fill_bitvector, get_size},
+    WriteGraph,
+};
 
 /// Creates a directed graph from a graph6 representation
 #[derive(Debug)]
@@ -54,7 +57,6 @@ impl DiGraph {
         let adj_bv_len = bit_vec.len() - (bit_vec.len() - (bv_len));
         bit_vec.truncate(adj_bv_len);
     }
-
 }
 
 impl GraphConversion for DiGraph {
@@ -74,10 +76,10 @@ impl GraphConversion for DiGraph {
 impl WriteGraph for DiGraph {
     fn write_graph(&self) -> String {
         let mut repr = String::new();
-        let size_char = char::from_u32(self.n as u32+ 63).unwrap();
+        let size_char = char::from_u32(self.n as u32 + 63).unwrap();
         let mut bv = self.bit_vec.to_vec();
         if bv.len() % 6 != 0 {
-            (0..6-(bv.len() % 6)).for_each(|_| bv.push(0));
+            (0..6 - (bv.len() % 6)).for_each(|_| bv.push(0));
         }
 
         repr.push('&');
