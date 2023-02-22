@@ -74,9 +74,6 @@ impl GraphConversion for DiGraph {
 }
 
 impl WriteGraph for DiGraph {
-    fn owned_bit_vec(&self) -> Vec<usize> {
-        self.bit_vec.clone()
-    }
 }
 
 #[cfg(test)]

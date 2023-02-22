@@ -82,9 +82,6 @@ impl GraphConversion for Graph {
     }
 }
 impl WriteGraph for Graph {
-    fn owned_bit_vec(&self) -> Vec<usize> {
-        self.upper_triangle()
-    }
 }
 
 #[cfg(test)]
