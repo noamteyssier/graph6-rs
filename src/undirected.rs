@@ -1,6 +1,6 @@
 use super::{GraphConversion, IOError};
 use crate::{
-    utils::{fill_bitvector, get_size, upper_triangle},
+    utils::{fill_bitvector, get_size},
     WriteGraph,
 };
 
@@ -58,11 +58,6 @@ impl Graph {
             }
         }
         bit_vec
-    }
-
-    /// Returns the upper triangle of the adjacency matrix
-    fn upper_triangle(&self) -> Vec<usize> {
-        upper_triangle(&self.bit_vec, self.n)
     }
 }
 impl GraphConversion for Graph {
