@@ -73,8 +73,7 @@ impl GraphConversion for DiGraph {
     }
 }
 
-impl WriteGraph for DiGraph {
-}
+impl WriteGraph for DiGraph {}
 
 #[cfg(test)]
 mod testing {

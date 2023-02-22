@@ -1,4 +1,4 @@
-use crate::{GraphConversion, utils::upper_triangle};
+use crate::{utils::upper_triangle, GraphConversion};
 
 /// Trait to write graphs into graph 6 formatted strings
 pub trait WriteGraph: GraphConversion {
@@ -66,12 +66,10 @@ mod testing {
         assert_eq!(repr, "&AW");
     }
 
-
     #[test]
     fn test_write_directed_n2_unmirrored() {
         let bit_vec = vec![0, 0, 1, 0];
         let repr = super::write_graph6(bit_vec, 2, true);
         assert_eq!(repr, "&AG");
     }
-
 }

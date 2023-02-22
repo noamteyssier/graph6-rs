@@ -81,8 +81,7 @@ impl GraphConversion for Graph {
         false
     }
 }
-impl WriteGraph for Graph {
-}
+impl WriteGraph for Graph {}
 
 #[cfg(test)]
 mod testing {
