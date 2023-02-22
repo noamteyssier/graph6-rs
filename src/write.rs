@@ -2,7 +2,6 @@ use crate::GraphConversion;
 
 /// Trait to write graphs into graph 6 formatted strings
 pub trait WriteGraph: GraphConversion {
-
     fn owned_bit_vec(&self) -> Vec<usize>;
 
     fn write_header(&self, repr: &mut String) {
@@ -10,7 +9,7 @@ pub trait WriteGraph: GraphConversion {
             repr.push('&');
         }
     }
-    
+
     fn write_size(&self, repr: &mut String) {
         let size_char = char::from_u32(self.size() as u32 + 63).unwrap();
         repr.push(size_char);
