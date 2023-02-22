@@ -1,6 +1,10 @@
 # graph6-rs
 
-a rust library for graph6 formatted files from NAUTY
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
+![actions status](https://github.com/noamteyssier/graph6-rs/workflows/CI/badge.svg)
+[![codecov](https://codecov.io/gh/noamteyssier/graph6-rs/branch/main/graph/badge.svg?token=1UIAB0XFRH)](https://codecov.io/gh/noamteyssier/graph6-rs)
+
+a rust library for converting to and from graph6 formatted files from NAUTY
 
 ## File Format Description
 
