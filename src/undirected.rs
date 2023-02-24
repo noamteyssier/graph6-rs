@@ -33,15 +33,8 @@ impl Graph {
     /// Builds the bitvector from the graph6 representation
     fn build_bitvector(bytes: &[u8], n: usize) -> Vec<usize> {
         let bv_len = n * (n - 1) / 2;
-        let mut bit_vec = fill_bitvector(bytes, n, 1);
-        Self::adjust_bitvector_len(&mut bit_vec, bv_len);
+        let bit_vec = fill_bitvector(bytes, bv_len, 1);
         Self::fill_from_triangle(&bit_vec, n)
-    }
-
-    /// Adjusts the length of the bitvector to the correct length
-    fn adjust_bitvector_len(bit_vec: &mut Vec<usize>, bv_len: usize) {
-        let adj_bv_len = bit_vec.len() - (bit_vec.len() - bv_len);
-        bit_vec.truncate(adj_bv_len);
     }
 
     /// Fills the adjacency bitvector from an upper triangle

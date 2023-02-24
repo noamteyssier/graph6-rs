@@ -47,15 +47,8 @@ impl DiGraph {
     /// representing the adjaceny matrix of the graph
     fn build_bitvector(bytes: &[u8], n: usize) -> Vec<usize> {
         let bv_len = n * n;
-        let mut bit_vec = fill_bitvector(bytes, n, 2);
-        Self::adjust_bitvector_len(&mut bit_vec, bv_len);
+        let bit_vec = fill_bitvector(bytes, bv_len, 2);
         bit_vec
-    }
-
-    /// Adjusts the bitvector length to the expected size of the digraph (n*n)
-    fn adjust_bitvector_len(bit_vec: &mut Vec<usize>, bv_len: usize) {
-        let adj_bv_len = bit_vec.len() - (bit_vec.len() - (bv_len));
-        bit_vec.truncate(adj_bv_len);
     }
 }
 
