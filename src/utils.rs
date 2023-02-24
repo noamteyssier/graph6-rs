@@ -2,15 +2,17 @@ use super::IOError;
 
 /// Iterates through the bytes of a graph and fills a bitvector representing
 /// the adjacency matrix of the graph
-pub fn fill_bitvector(bytes: &[u8], n: usize, offset: usize) -> Vec<usize> {
-    let mut bit_vec = Vec::with_capacity(n * n);
-    for byte in bytes.iter().skip(offset).take(n) {
-        let byte = byte - 63;
-        for shift in (0..6).rev() {
-            if (byte & 1 << shift) > 0 {
-                bit_vec.push(1);
-            } else {
-                bit_vec.push(0);
+pub fn fill_bitvector(bytes: &[u8], size: usize, offset: usize) -> Vec<usize> {
+    let mut bit_vec = Vec::with_capacity(size);
+    let mut pos = 0;
+    for b in bytes.iter().skip(offset) {
+        let b = b - 63;
+        for i in 0..6 {
+            let bit = (b >> (5 - i)) & 1;
+            bit_vec.push(bit as usize);
+            pos += 1;
+            if pos == size {
+                break;
             }
         }
     }
@@ -75,16 +77,18 @@ mod testing {
 
     #[test]
     fn test_bitvector() {
-        let bytes = b"GG";
-        let bit_vec = super::fill_bitvector(bytes, 2, 0);
-        assert_eq!(bit_vec, vec![0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0]);
+        let bytes = b"Bw";
+        let n = 3;
+        let bit_vec = super::fill_bitvector(bytes, n*n, 0);
+        assert_eq!(bit_vec, vec![0, 0, 0, 0, 1, 1, 1, 1, 1]);
     }
 
     #[test]
     fn test_bitvector_offset() {
-        let bytes = b"AG";
-        let bit_vec = super::fill_bitvector(bytes, 2, 1);
-        assert_eq!(bit_vec, vec![0, 0, 1, 0, 0, 0]);
+        let bytes = b"Bw";
+        let n = 2;
+        let bit_vec = super::fill_bitvector(bytes, n*n, 1);
+        assert_eq!(bit_vec, vec![1, 1, 1, 0]);
     }
 
     #[test]
