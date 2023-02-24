@@ -8,4 +8,4 @@ pub use conversion::GraphConversion;
 pub use directed::DiGraph;
 pub use error::IOError;
 pub use undirected::Graph;
-pub use write::{WriteGraph, write_graph6};
+pub use write::{write_graph6, WriteGraph};

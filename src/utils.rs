@@ -79,7 +79,7 @@ mod testing {
     fn test_bitvector() {
         let bytes = b"Bw";
         let n = 3;
-        let bit_vec = super::fill_bitvector(bytes, n*n, 0);
+        let bit_vec = super::fill_bitvector(bytes, n * n, 0);
         assert_eq!(bit_vec, vec![0, 0, 0, 0, 1, 1, 1, 1, 1]);
     }
 
@@ -87,7 +87,7 @@ mod testing {
     fn test_bitvector_offset() {
         let bytes = b"Bw";
         let n = 2;
-        let bit_vec = super::fill_bitvector(bytes, n*n, 1);
+        let bit_vec = super::fill_bitvector(bytes, n * n, 1);
         assert_eq!(bit_vec, vec![1, 1, 1, 0]);
     }
 
