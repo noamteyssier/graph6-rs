@@ -136,6 +136,14 @@ mod testing {
     }
 
     #[test]
+    fn test_to_flat() {
+        let repr = r"A_";
+        let graph = Graph::from_g6(repr).unwrap();
+        let flat = graph.to_flat();
+        assert_eq!(flat, "0110");
+    }
+
+    #[test]
     fn test_write_n2() {
         let repr = r"A_";
         let graph = Graph::from_g6(repr).unwrap();

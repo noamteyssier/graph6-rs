@@ -165,6 +165,14 @@ mod testing {
     }
 
     #[test]
+    fn test_to_flat() {
+        let repr = r"&AG";
+        let graph = super::DiGraph::from_d6(repr).unwrap();
+        let flat = graph.to_flat();
+        assert_eq!(flat, "0010");
+    }
+
+    #[test]
     fn test_write_n2() {
         let repr = r"&AG";
         let graph = super::DiGraph::from_d6(repr).unwrap();

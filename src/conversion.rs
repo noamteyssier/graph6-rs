@@ -81,6 +81,20 @@ pub trait GraphConversion {
         adj
     }
 
+    /// Returns the graph in a flat adjacency matrix
+    fn to_flat(&self) -> String {
+        let n = self.size();
+        let bit_vec = self.bit_vec();
+
+        let mut flat = String::new();
+        for i in 0..n {
+            for j in 0..n {
+                flat.push_str(&format!("{}", bit_vec[i * n + j]));
+            }
+        }
+        flat
+    }
+
     /// Returns the graph in the Pajek NET format
     fn to_net(&self) -> String {
         let n = self.size();
