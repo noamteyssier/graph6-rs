@@ -34,6 +34,31 @@ impl DiGraph {
         Ok(Self { bit_vec, n })
     }
 
+    /// Creates a new DiGraph from a flattened adjacency matrix
+    ///
+    /// # Arguments
+    /// * `adj` - A flattened adjacency matrix
+    ///
+    /// # Errors
+    /// Returns an error if the adjacency matrix is invalid (i.e. not square)
+    ///
+    /// # Examples
+    /// ```
+    /// use graph6_rs::DiGraph;
+    /// let graph = DiGraph::from_adj(&[0, 0, 1, 0]).unwrap();
+    /// assert_eq!(graph.n, 2);
+    /// assert_eq!(graph.bit_vec, &[0, 0, 1, 0]);
+    /// ```
+    pub fn from_adj(adj: &[usize]) -> Result<Self, IOError> {
+        let n2 = adj.len();
+        let n = (n2 as f64).sqrt() as usize;
+        if n * n != n2 {
+            return Err(IOError::InvalidAdjacencyMatrix);
+        }
+        let bit_vec = adj.to_vec();
+        Ok(Self { bit_vec, n })
+    }
+
     /// Validates graph6 directed representation
     fn valid_digraph(repr: &[u8]) -> Result<bool, IOError> {
         if repr[0] == b'&' {
@@ -87,8 +112,24 @@ mod testing {
     }
 
     #[test]
+    fn test_from_adj() {
+        let adj = &[0, 0, 1, 0];
+        let graph = super::DiGraph::from_adj(adj).unwrap();
+        assert_eq!(graph.size(), 2);
+        assert_eq!(graph.bit_vec(), vec![0, 0, 1, 0]);
+        assert_eq!(graph.write_graph(), "&AG");
+    }
+
+    #[test]
+    fn test_from_nonsquare_adj() {
+        let adj = &[0, 0, 1, 0, 1];
+        let graph = super::DiGraph::from_adj(adj);
+        assert!(graph.is_err());
+    }
+
+    #[test]
     /// Adjacency matrix:
-    /// 0 1
+    /// 0 0
     /// 1 0
     fn test_bitvector_n2() {
         let repr = "&AG";
