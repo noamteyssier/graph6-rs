@@ -3,6 +3,7 @@ pub enum IOError {
     InvalidDigraphHeader,
     InvalidSizeChar,
     GraphTooLarge,
+    InvalidAdjacencyMatrix,
 }
 
 #[cfg(test)]

@@ -30,6 +30,43 @@ impl Graph {
         Ok(Self { bit_vec, n })
     }
 
+    /// Creates a new undirected graph from a flattened adjacency matrix.
+    /// The adjacency matrix must be square.
+    /// The adjacency matrix will be forced into a symmetric matrix.
+    ///
+    /// # Arguments
+    /// * `adj` - A flattened adjacency matrix
+    ///
+    /// # Errors
+    /// Returns an error if the adjacency matrix is invalid (i.e. not square)
+    ///
+    /// # Example
+    /// ```
+    /// use graph6_rs::Graph;
+    /// let graph = Graph::from_adj(&[0, 0, 1, 0]).unwrap();
+    /// assert_eq!(graph.n, 2);
+    /// assert_eq!(graph.bit_vec, &[0, 1, 1, 0]);
+    /// ```
+    pub fn from_adj(adj: &[usize]) -> Result<Self, IOError> {
+        let n2 = adj.len();
+        let n = (n2 as f64).sqrt() as usize;
+        if n * n != n2 {
+            return Err(IOError::InvalidAdjacencyMatrix);
+        }
+        let mut bit_vec = vec![0; n * n];
+        for i in 0..n {
+            for j in 0..n {
+                if adj[i * n + j] == 1 {
+                    let idx = i * n + j;
+                    let jdx = j * n + i;
+                    bit_vec[idx] = 1;
+                    bit_vec[jdx] = 1;
+                }
+            }
+        }
+        Ok(Self { bit_vec, n })
+    }
+
     /// Builds the bitvector from the graph6 representation
     fn build_bitvector(bytes: &[u8], n: usize) -> Vec<usize> {
         let bv_len = n * (n - 1) / 2;
@@ -165,5 +202,21 @@ mod testing {
         let graph = Graph::from_g6(repr).unwrap();
         let g6 = graph.write_graph();
         assert_eq!(g6, repr);
+    }
+
+    #[test]
+    fn test_from_adj() {
+        let adj = &[0, 0, 1, 0];
+        let graph = Graph::from_adj(adj).unwrap();
+        assert_eq!(graph.size(), 2);
+        assert_eq!(graph.bit_vec(), &[0, 1, 1, 0]);
+        assert_eq!(graph.write_graph(), "A_");
+    }
+
+    #[test]
+    fn test_from_nonsquare_adj() {
+        let adj = &[0, 0, 1, 0, 1];
+        let graph = Graph::from_adj(adj);
+        assert!(graph.is_err());
     }
 }
