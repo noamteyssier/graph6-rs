@@ -26,7 +26,7 @@ impl Graph {
     pub fn from_g6(repr: &str) -> Result<Self, IOError> {
         let bytes = repr.as_bytes();
         let n = get_size(bytes, 0)?;
-        let bit_vec = Self::build_bitvector(bytes, n);
+        let bit_vec = Self::build_bitvector(bytes, n)?;
         Ok(Self { bit_vec, n })
     }
 
@@ -68,26 +68,30 @@ impl Graph {
     }
 
     /// Builds the bitvector from the graph6 representation
-    fn build_bitvector(bytes: &[u8], n: usize) -> Vec<usize> {
+    fn build_bitvector(bytes: &[u8], n: usize) -> Result<Vec<usize>, IOError> {
         let bv_len = n * (n - 1) / 2;
-        let bit_vec = fill_bitvector(bytes, bv_len, 1);
+        let Some(bit_vec) = fill_bitvector(bytes, bv_len, 1) else {
+            return Err(IOError::NonCanonicalEncoding);
+        };
         Self::fill_from_triangle(&bit_vec, n)
     }
 
     /// Fills the adjacency bitvector from an upper triangle
-    fn fill_from_triangle(tri: &[usize], n: usize) -> Vec<usize> {
+    fn fill_from_triangle(tri: &[usize], n: usize) -> Result<Vec<usize>, IOError> {
         let mut bit_vec = vec![0; n * n];
         let mut tri_iter = tri.iter();
         for i in 1..n {
             for j in 0..i {
                 let idx = i * n + j;
                 let jdx = j * n + i;
-                let val = *tri_iter.next().unwrap();
+                let Some(&val) = tri_iter.next() else {
+                    return Err(IOError::NonCanonicalEncoding);
+                };
                 bit_vec[idx] = val;
                 bit_vec[jdx] = val;
             }
         }
-        bit_vec
+        Ok(bit_vec)
     }
 }
 impl GraphConversion for Graph {
@@ -141,6 +145,18 @@ mod testing {
             graph.bit_vec(),
             &[0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0]
         );
+    }
+
+    #[test]
+    fn test_too_short_input() {
+        let parsed = Graph::from_g6("a");
+        assert!(parsed.is_err());
+    }
+
+    #[test]
+    fn test_invalid_char() {
+        let parsed = Graph::from_g6("A1");
+        assert!(parsed.is_err());
     }
 
     #[test]

@@ -1,8 +1,8 @@
 [package]
 name = "graph6-rs"
-version = "0.1.8"
+version = "0.2.1"
 edition = "2021"
-keywords = [ "parser", "graphs", "graph6", "nauty" ]
+keywords = ["parser", "graphs", "graph6", "nauty"]
 license = "MIT"
 description = "A library for parsing graph6/digraph6 strings and converting them into other text based formats"
 documentation = "https://docs.rs/graph6-rs"

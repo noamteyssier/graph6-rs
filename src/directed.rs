@@ -30,7 +30,9 @@ impl DiGraph {
         let bytes = repr.as_bytes();
         Self::valid_digraph(bytes)?;
         let n = get_size(bytes, 1)?;
-        let bit_vec = Self::build_bitvector(bytes, n);
+        let Some(bit_vec) = Self::build_bitvector(bytes, n) else {
+            return Err(IOError::NonCanonicalEncoding);
+        };
         Ok(Self { bit_vec, n })
     }
 
@@ -70,7 +72,7 @@ impl DiGraph {
 
     /// Iteratores through the bytes and builds a bitvector
     /// representing the adjaceny matrix of the graph
-    fn build_bitvector(bytes: &[u8], n: usize) -> Vec<usize> {
+    fn build_bitvector(bytes: &[u8], n: usize) -> Option<Vec<usize>> {
         let bv_len = n * n;
         let bit_vec = fill_bitvector(bytes, bv_len, 2);
         bit_vec
