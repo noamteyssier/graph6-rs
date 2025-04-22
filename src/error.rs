@@ -4,6 +4,7 @@ pub enum IOError {
     InvalidSizeChar,
     GraphTooLarge,
     InvalidAdjacencyMatrix,
+    NonCanonicalEncoding,
 }
 
 #[cfg(test)]
